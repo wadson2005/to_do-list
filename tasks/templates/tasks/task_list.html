@@ -1,0 +1,86 @@
+<!-- templates/tasks/task_list.html -->
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List</title>
+    <style>
+        
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            color: #007BFF;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin: 10px 0;
+        }
+
+        a {
+            text-decoration: none;
+            color: #007BFF;
+            margin-right: 20px;
+        }
+    </style>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://unpkg.com/howler"></script>
+</head>
+
+<body>
+    <h1>To-Do List</h1>
+
+    <h1>To-Do List</h1>
+
+    <ul>
+        {% for task in tasks %}
+        <li>
+            {{ task.title }}
+            {% if not task.completed %}
+            <form method="post" action="{% url 'complete_task' task.id %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Concluir</button>
+            </form>
+            {% else %}
+            <span style="color: green;">(Concluída)</span>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+
+    <a href="{% url 'add_task' %}">Adicionar Tarefa</a>
+    <script>
+        $(document).ready(function() {
+            $('form').submit(function(e) {
+                e.preventDefault();
+
+                var form = $(this);
+                $.post(form.attr('action'), form.serialize(), function(response) {
+                    if (response.status === 'success') {
+                        var sound = new Howl({
+    src: ['{% static "tasks/audios/completed.mp3" %}'],
+    volume: 1.0,
+});
+
+
+                        sound.play();
+
+                        location.reload();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
